@@ -4,7 +4,7 @@ The following instructions are for installing on MacOS.
 ## Jekyll
 Ref: https://jekyllrb.com/docs/installation/macos/
 
-Use `chruby` because of its simplicity.
+Jekyll is programmed in Ruby, so we will need to install Ruby and its respective gems. It is recommended to use `chruby` as the Ruby version manager because of its simplicity for changing Ruby versions.
 ```
 $ brew install chruby ruby-install xz
 
@@ -21,46 +21,27 @@ $ gem install jekyll bundler
 ```
 
 ## Node
-Install node, which is used to run thumbnail script:
+Install node, which is used to run thumbnail JS script:
 ```
 $ brew install node
 ```
 
-# Edit Site
-To create a new post:
-1. Create a folder with `YYYY-MM-dd` format in `assets/images` and drop the images into that directory.
-2. Create a new `.md` file in `_posts` with format `YYYY-MM-dd-photos.md`, where the `YYYY-MM-dd` matches that in step 1.
-3. With the file created in step 2, use the below, replacing `<TITLE>` and `<SUBTITLE>` as well as the `YYYY-MM-dd` from step 1.
-4. Replace `<IMAGE_FILE>` with the image file basename; it leverage the folder structure and pull the absolute path based on the date.
-```
----
-layout: gallery
-title: "<TITLE>"
-subtitle: "<SUBTITLE>"
-date: YYYY-MM-dd
-categories: gallery
-excerpt: "<EXCERPT>"
-cover: <IMAGE_FILE>
----
-```
-
-# Building and Deploying Site
-The build and deploy process is performed via a GitHub action workflow. Because of 3rd party plugin(s) utilizations, a custom workflow must be written. This includes changing the source to "GitHub Actions" at https://github.com/eychung/eychung.github.io/settings/pages.
-
-# Preview Site
+# Preview Site (Locally)
 For a basic build without re-mapping image tags:
 ```
-# First cd into docs/
 $ bundle exec jekyll serve
 ```
 
 For a complete build, run the custom rake script:
 ```
-# First cd into docs/
 $ bundle exec rake custom_serve
 ```
 
 View webpage at: http://localhost:4000/
+
+# Building and Deploying Site
+## GitHub Actions
+The build and deploy process is performed via a GitHub action workflow. Because of 3rd party plugin(s) utilizations, a custom workflow must be written. In this repository, the workflow is defined in `.github/workflows/jekyll-custom.yml`. This includes changing the source to "GitHub Actions" at the Pages section of the Settings tab.
 
 # Plugins
 ## JavaScript
