@@ -16,51 +16,7 @@ layout: page
 <body>
 
     <!-- Filter Controls -->
-    <div class="filter-bar">
-        <div class="filter-group dropdown">
-            <button class="dropdown-toggle">Color</button>
-            <div class="dropdown-content">
-                <label><input type="checkbox" value="black" class="filter" data-type="color">Black</label>
-                <label><input type="checkbox" value="blue" class="filter" data-type="color">Blue</label>
-                <label><input type="checkbox" value="brown" class="filter" data-type="color">Brown</label>
-                <label><input type="checkbox" value="gray" class="filter" data-type="color">Gray</label>
-                <label><input type="checkbox" value="green" class="filter" data-type="color">Green</label>
-                <label><input type="checkbox" value="orange" class="filter" data-type="color">Orange</label>
-                <label><input type="checkbox" value="purple" class="filter" data-type="color">Purple</label>
-                <label><input type="checkbox" value="red" class="filter" data-type="color">Red</label>
-                <label><input type="checkbox" value="white" class="filter" data-type="color">White</label>
-                <label><input type="checkbox" value="yellow" class="filter" data-type="color">Yellow</label>
-            </div>
-        </div>
-        <div class="filter-group dropdown">
-            <button class="dropdown-toggle">Theme</button>
-            <div class="dropdown-content">
-                <label><input type="checkbox" value="animal" class="filter" data-type="theme">Animal</label>
-                <label><input type="checkbox" value="architecture" class="filter" data-type="theme">Architecture</label>
-                <label><input type="checkbox" value="city" class="filter" data-type="theme">City</label>
-                <label><input type="checkbox" value="nature" class="filter" data-type="theme">Nature</label>
-                <label><input type="checkbox" value="sky" class="filter" data-type="theme">Sky</label>
-                <label><input type="checkbox" value="water" class="filter" data-type="theme">Water</label>
-            </div>
-        </div>
-        <div class="filter-group dropdown">
-            <button class="dropdown-toggle">Places</button>
-            <div class="dropdown-content">
-                <label><input type="checkbox" value="place-a" class="filter" data-type="places">Place A</label>
-                <label><input type="checkbox" value="place-b" class="filter" data-type="places">Place B</label>
-                <label><input type="checkbox" value="place-c" class="filter" data-type="places">Place C</label>
-            </div>
-        </div>
-        <div class="filter-group dropdown">
-            <button class="dropdown-toggle">Season</button>
-            <div class="dropdown-content">
-                <label><input type="checkbox" value="spring" class="filter" data-type="season">Spring</label>
-                <label><input type="checkbox" value="summer" class="filter" data-type="season">Summer</label>
-                <label><input type="checkbox" value="autumn" class="filter" data-type="season">Autumn</label>
-                <label><input type="checkbox" value="winter" class="filter" data-type="season">Winter</label>
-            </div>
-        </div>
-    </div>
+    <div class="filter-bar"></div>
 
     <div id="filter-display-container"></div>
 
@@ -139,13 +95,13 @@ layout: page
             const filters = {};
             filterGroups.forEach(group => {
                 const type = group.querySelector('input').dataset.type;
-                filters[type] = getCheckedFilters(type);
+                filters[type] = getCheckedFilters(type).map(filter => filter.toLowerCase());
             });
 
             container.innerHTML = '';
 
             allItems.forEach(item => {
-                const tags = item.getAttribute('data-tags').split(' ');
+                const tags = item.getAttribute('data-tags').split(' ').map(tag => tag.toLowerCase());
                 const matches = Object.keys(filters).every(type => {
                     const selectedFilters = filters[type];
                     return selectedFilters.length === 0 || selectedFilters.some(filter => tags.includes(filter));
@@ -157,19 +113,60 @@ layout: page
             });
         }
 
+        function loadFilters(xml) {
+            const filterContainer = document.querySelector('.filter-bar');
+            const filterGroups = xml.getElementsByTagName('filter-group');
+
+            Array.from(filterGroups).forEach(group => {
+                const groupName = group.getAttribute('name');
+                const groupDiv = document.createElement('div');
+                groupDiv.classList.add('filter-group', 'dropdown');
+
+                const button = document.createElement('button');
+                button.classList.add('dropdown-toggle');
+                button.textContent = groupName;
+                groupDiv.appendChild(button);
+
+                const dropdownContent = document.createElement('div');
+                dropdownContent.classList.add('dropdown-content');
+
+                const options = group.getElementsByTagName('option');
+                Array.from(options).forEach(option => {
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.value = option.getAttribute('value');
+                    input.classList.add('filter');
+                    input.dataset.type = groupName.toLowerCase();
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(option.textContent));
+                    dropdownContent.appendChild(label);
+                });
+
+                groupDiv.appendChild(dropdownContent);
+                filterContainer.appendChild(groupDiv);
+            });
+
+            // Attach event listeners to all filter checkboxes
+            document.querySelectorAll('.filter').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    applyFilters();
+                    updateFilterDisplayContainer();
+                });
+            });
+        }
+
+        fetch('/assets/filters.xml')
+            .then(response => response.text())
+            .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+            .then(loadFilters)
+            .catch(error => console.error('Error loading XML:', error));
+
         const container = document.querySelector('.flex-container');
         const allItems = Array.from(container.children);  // Store the original items
 
         // Initialize PhotoSwipe setup when the window loads
         window.onload = initializePhotoSwipe;
-
-        // Attach event listeners to all filter checkboxes
-        document.querySelectorAll('.filter').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                applyFilters();
-                updateFilterDisplayContainer();
-            });
-        });
 
     </script>
 
