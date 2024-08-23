@@ -1,0 +1,5 @@
+
+task :custom_serve do
+    sh "node _utils/generate-images-json.js "
+    sh "bundle exec jekyll serve"
+end

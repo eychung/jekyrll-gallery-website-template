@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "exiftool-vendored": "^28.2.1"
+  }
+}

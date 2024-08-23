@@ -1,0 +1,185 @@
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+    /* Space between images */
+    overflow: hidden;
+    /* Hide the overflow */
+}
+
+.flex-item-wrapper {
+    height: 20vh;
+    flex: 1 1 auto;
+}
+
+.flex-item-wrapper-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-align: center;
+}
+
+.flex-item-wrapper:hover .grid-item-overlay {
+    opacity: 1;
+}
+
+.flex-item-wrapper:hover img {
+    opacity: 0.7;
+}
+
+.flex-item {
+    max-height: 100%;
+    min-width: 100%;
+    object-fit: cover;
+    /* Maintain aspect ratio by cropping */
+}
+
+
+/* Filter Bar Styles */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Filter Group Styles */
+.filter-group {
+    position: relative;
+    margin-right: 10px;
+}
+
+.filter-group label {
+    cursor: pointer;
+    margin: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    /* Aligns the checkbox and label text vertically */
+    vertical-align: middle;
+    font-size: 14px;
+    /* Adjust the text size if needed */
+}
+
+.filter-group input {
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+
+/* Dropdown Styles */
+.dropdown-toggle {
+    background-color: #f8f9fa;
+    color: black;
+
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+
+    display: none;
+
+    min-width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    font-size: 10px;
+}
+
+.dropdown-content label {
+    display: block;
+    margin: 5px 0;
+    align-items: center;
+    /* Ensures vertical alignment in the dropdown as well */
+    white-space: nowrap;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Hide dropdown content if the toggle button is disabled */
+.dropdown .dropdown-toggle:disabled+.dropdown-content {
+    display: none;
+}
+
+/* Checkbox Styles */
+.filter-group input[type="checkbox"] {
+    appearance: none;
+    cursor: pointer;
+    vertical-align: middle;
+
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 5px;
+
+    background-color: #f8f9fa;
+}
+
+.filter-group input[type="checkbox"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.filter-group input[type="checkbox"]:checked + label {
+    color: #007bff;
+}
+
+
+#filter-display-container {
+    display: flex;
+    gap: 5px;
+}
+
+.text-with-close {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.filter-tag-text {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.close-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    color: #333;
+    margin-left: 1px;
+}
+
+.close-btn:hover {
+    color: red;
+}

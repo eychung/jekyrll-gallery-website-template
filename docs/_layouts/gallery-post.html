@@ -1,0 +1,77 @@
+---
+layout: page
+---
+
+{% assign post_date = page.date | date: "%Y-%m-%d" %}
+{% assign image_folder = "/assets/images/" | append: post_date %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/assets/css/photoswipe.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+
+    <article>
+        <h1>{{ page.subtitle }}</h1>
+        <p class="post-meta">{{ page.datePublished | default: page.date | date: "%B %d, %Y" }}</p>
+        <div class="pswp-gallery pswp-gallery--single-column" id="gallery">
+            <div class="flex-container">
+                {% for file in site.static_files %}
+                    {% if file.path contains image_folder %}
+                        {% assign relative_path = file.path | remove: image_folder %}
+                        {% assign slash_count = relative_path | split: '/' | size %}
+                        {% if slash_count == 2 %}
+                            <a href="{{ file.path }}" target="_blank" class="flex-item-wrapper">
+                                <img src="{% thumbnail_img file.path 1000 %}" alt="{{ photo.title }}" data-description="{{ photo.description }}" class="flex-item">
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </article>
+
+    <!-- Sets up the 'a' children for PhotoSwipe requirement -->
+    <script>
+        window.onload = function () {
+            const links = document.querySelectorAll('.flex-item-wrapper');
+            links.forEach(link => {
+                const img = new Image();
+                img.src = link.href;
+
+                img.onload = function () {
+                    const height = img.naturalHeight;
+                    const width = img.naturalWidth;
+
+                    link.setAttribute('data-pswp-height', height);
+                    link.setAttribute('data-pswp-width', width);
+                };
+            });
+        };
+    </script>
+
+    <!-- PhotoSwipe module -->
+    <script type="module">
+        import PhotoSwipeLightbox from '/assets/js/photoswipe-lightbox.esm.js';
+        import PhotoSwipe from '/assets/js/photoswipe.esm.js';
+
+        const lightbox = new PhotoSwipeLightbox({
+            bgOpacity: 0.8,
+            gallery: '#gallery',
+            children: 'a',  // Elements within gallery (slides)
+            showHideAnimationType: 'zoom',
+            pswpModule: PhotoSwipe
+        });
+        lightbox.init();
+    </script>
+
+</body>
+
+</html>

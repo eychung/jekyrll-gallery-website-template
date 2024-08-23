@@ -1,0 +1,193 @@
+---
+layout: page
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <link rel="stylesheet" href="/assets/css/photoswipe.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body>
+
+    <!-- Filter Controls -->
+    <div class="filter-bar">
+        <div class="filter-group dropdown">
+            <button class="dropdown-toggle">Color</button>
+            <div class="dropdown-content">
+                <label><input type="checkbox" value="black" class="filter" data-type="color">Black</label>
+                <label><input type="checkbox" value="blue" class="filter" data-type="color">Blue</label>
+                <label><input type="checkbox" value="brown" class="filter" data-type="color">Brown</label>
+                <label><input type="checkbox" value="gray" class="filter" data-type="color">Gray</label>
+                <label><input type="checkbox" value="green" class="filter" data-type="color">Green</label>
+                <label><input type="checkbox" value="orange" class="filter" data-type="color">Orange</label>
+                <label><input type="checkbox" value="purple" class="filter" data-type="color">Purple</label>
+                <label><input type="checkbox" value="red" class="filter" data-type="color">Red</label>
+                <label><input type="checkbox" value="white" class="filter" data-type="color">White</label>
+                <label><input type="checkbox" value="yellow" class="filter" data-type="color">Yellow</label>
+            </div>
+        </div>
+        <div class="filter-group dropdown">
+            <button class="dropdown-toggle">Theme</button>
+            <div class="dropdown-content">
+                <label><input type="checkbox" value="animal" class="filter" data-type="theme">Animal</label>
+                <label><input type="checkbox" value="architecture" class="filter" data-type="theme">Architecture</label>
+                <label><input type="checkbox" value="city" class="filter" data-type="theme">City</label>
+                <label><input type="checkbox" value="nature" class="filter" data-type="theme">Nature</label>
+                <label><input type="checkbox" value="sky" class="filter" data-type="theme">Sky</label>
+                <label><input type="checkbox" value="water" class="filter" data-type="theme">Water</label>
+            </div>
+        </div>
+        <div class="filter-group dropdown">
+            <button class="dropdown-toggle">Places</button>
+            <div class="dropdown-content">
+                <label><input type="checkbox" value="place-a" class="filter" data-type="places">Place A</label>
+                <label><input type="checkbox" value="place-b" class="filter" data-type="places">Place B</label>
+                <label><input type="checkbox" value="place-c" class="filter" data-type="places">Place C</label>
+            </div>
+        </div>
+        <div class="filter-group dropdown">
+            <button class="dropdown-toggle">Season</button>
+            <div class="dropdown-content">
+                <label><input type="checkbox" value="spring" class="filter" data-type="season">Spring</label>
+                <label><input type="checkbox" value="summer" class="filter" data-type="season">Summer</label>
+                <label><input type="checkbox" value="autumn" class="filter" data-type="season">Autumn</label>
+                <label><input type="checkbox" value="winter" class="filter" data-type="season">Winter</label>
+            </div>
+        </div>
+    </div>
+
+    <div id="filter-display-container"></div>
+
+    <article>
+        <h1>{{ page.subtitle }}</h1>
+        <div class="pswp-gallery pswp-gallery--single-column" id="gallery">
+            <div class="flex-container">
+                {% assign reversed_files = site.data.images | reverse %}
+                {% for file in reversed_files %}
+                    <a href="{{ file.path }}" target="_blank" class="flex-item-wrapper" data-tags="{{ file.tags | join: ' ' }}">
+                        <img src="{% thumbnail_img file.path 1000 %}" class="flex-item">
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </article>
+
+    <script>
+        function initializePhotoSwipe() {
+            const links = document.querySelectorAll('.flex-item-wrapper');
+            links.forEach(link => {
+                const img = new Image();
+                img.src = link.href;
+
+                img.onload = function () {
+                    link.setAttribute('data-pswp-height', img.naturalHeight);
+                    link.setAttribute('data-pswp-width', img.naturalWidth);
+                };
+            });
+        };
+
+        // Function to create a div with text and a close button
+        function createDiv(filter, checkbox) {
+            const div = document.createElement('div');
+            div.classList.add('text-with-close');
+            
+            const span = document.createElement('span');
+            span.classList.add('filter-tag-text');
+            span.textContent = filter;
+            
+            const closeButton = document.createElement('button');
+            closeButton.classList.add('close-btn');
+            closeButton.innerHTML = '&times;';
+            closeButton.onclick = () => {
+                div.remove();
+                checkbox.checked = false;
+                applyFilters();
+                updateFilterDisplayContainer();
+            };
+            
+            div.appendChild(span);
+            div.appendChild(closeButton);
+            
+            return div;
+        }
+
+        // Function to update the container with selected options' divs
+        function updateFilterDisplayContainer() {
+            const filterDisplayContainer = document.getElementById('filter-display-container');
+            filterDisplayContainer.innerHTML = '';
+
+            const checkedFilters = document.querySelectorAll('.filter:checked');
+            checkedFilters.forEach(checkbox => {
+                const filter = checkbox.parentElement.textContent.trim();
+                const div = createDiv(filter, checkbox);
+                filterDisplayContainer.appendChild(div);
+            });
+        }
+
+        function getCheckedFilters(dataType) {
+            return Array.from(document.querySelectorAll(`input[data-type="${dataType}"]:checked`)).map(checkedFilter => checkedFilter.value);
+        }
+
+        function applyFilters() {
+            const filterGroups = Array.from(document.querySelectorAll('.filter-group'));
+            const filters = {};
+            filterGroups.forEach(group => {
+                const type = group.querySelector('input').dataset.type;
+                filters[type] = getCheckedFilters(type);
+            });
+
+            container.innerHTML = '';
+
+            allItems.forEach(item => {
+                const tags = item.getAttribute('data-tags').split(' ');
+                const matches = Object.keys(filters).every(type => {
+                    const selectedFilters = filters[type];
+                    return selectedFilters.length === 0 || selectedFilters.some(filter => tags.includes(filter));
+                });
+
+                if (matches) {
+                    container.appendChild(item);
+                }
+            });
+        }
+
+        const container = document.querySelector('.flex-container');
+        const allItems = Array.from(container.children);  // Store the original items
+
+        // Initialize PhotoSwipe setup when the window loads
+        window.onload = initializePhotoSwipe;
+
+        // Attach event listeners to all filter checkboxes
+        document.querySelectorAll('.filter').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                applyFilters();
+                updateFilterDisplayContainer();
+            });
+        });
+
+    </script>
+
+    <!-- PhotoSwipe module -->
+    <script type="module">
+        import PhotoSwipeLightbox from '/assets/js/photoswipe-lightbox.esm.js';
+        import PhotoSwipe from '/assets/js/photoswipe.esm.js';
+
+        const lightbox = new PhotoSwipeLightbox({
+            bgOpacity: 0.8,
+            gallery: '#gallery',
+            children: 'a',  // Elements within gallery (slides)
+            showHideAnimationType: 'zoom',
+            pswpModule: PhotoSwipe
+        });
+        lightbox.init();
+    </script>
+
+</body>
+
+</html>
